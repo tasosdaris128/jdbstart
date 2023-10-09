@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tasos.jdbstart.logger.Log;
+
 /*
  *
  * Connection pool manager.
@@ -26,7 +28,7 @@ public class MainConnectionPool implements ConnectionPool {
 
     public static MainConnectionPool create(String url, String user, String password) throws SQLException {
 
-        List<Connection> pool = new ArrayList<>(POOL_SIZE);
+        List<Connection> pool = new ArrayList<>();
 
         for (int i = 0; i < POOL_SIZE; i++) {
             pool.add(createConnection(url, user, password));
@@ -78,7 +80,11 @@ public class MainConnectionPool implements ConnectionPool {
 
     @Override
     public void shutdown() throws SQLException {
+        Log.d("Releasing connections...");
+
         this.usedConnections.forEach(this::releaseConnection);
+
+        Log.d("Closing connections...");
 
         for (Connection connection: this.connectionPool) {
             connection.close();
@@ -91,6 +97,11 @@ public class MainConnectionPool implements ConnectionPool {
     @Override
     public int size() {
         return connectionPool.size() + usedConnections.size();
+    }
+
+    @Override
+    public int countUsed() {
+        return usedConnections.size();
     }
 
     @Override

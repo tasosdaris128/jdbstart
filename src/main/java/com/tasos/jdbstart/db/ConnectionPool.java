@@ -45,4 +45,9 @@ public interface ConnectionPool {
      * Returns the size of the connection pool.
      */
     int size();
+
+    /*
+     * Returns the count of the used connections.
+     */
+    int countUsed();
 }
