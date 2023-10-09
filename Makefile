@@ -7,7 +7,7 @@ build:
 
 run:
 	make build
-	java -jar target/gs-maven-0.1.0.jar
+	java -jar target/tasos-bin-0.1.0.jar
 
 clean:
 	mvn clean
