@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import com.sun.net.httpserver.HttpServer;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.controller.InsertController;
+import com.tasos.jdbstart.controller.SelectAllController;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.logger.Log;
 
@@ -33,6 +34,7 @@ public class App {
             
             server.createContext("/ping", new BasicController());
             server.createContext("/insert", new InsertController(connectionPool));
+            server.createContext("/select", new SelectAllController(connectionPool));
 
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
