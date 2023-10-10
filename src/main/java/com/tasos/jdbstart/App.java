@@ -30,7 +30,7 @@ public class App {
             
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             
-            server.createContext("/ping", new BasicController(connectionPool));
+            server.createContext("/ping", new BasicController());
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 

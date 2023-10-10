@@ -1,7 +1,6 @@
 package com.tasos.jdbstart.controller;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.logger.Log;
 
 import java.io.IOException;
@@ -10,12 +9,8 @@ import java.io.OutputStream;
 import com.sun.net.httpserver.HttpExchange;
 
 public class BasicController implements HttpHandler {
-
-    private MainConnectionPool pool;
-
-    public BasicController(MainConnectionPool pool) {
-        this.pool = pool;
-    }
+    
+    public BasicController() {}
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
