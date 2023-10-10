@@ -1,6 +1,7 @@
-all: build
+all: run
 
 build:
+	clear
 	mvn clean
 	mvn compile
 	mvn package
@@ -14,3 +15,7 @@ run:
 clean:
 	mvn clean
 	clear
+
+test:
+	clear
+	mvn test
