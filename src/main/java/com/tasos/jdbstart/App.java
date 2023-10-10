@@ -12,6 +12,7 @@ import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.controller.InsertController;
 import com.tasos.jdbstart.controller.SelectAllController;
 import com.tasos.jdbstart.db.MainConnectionPool;
+import com.tasos.jdbstart.utils.Cache;
 import com.tasos.jdbstart.utils.PropertyManager;
 
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,8 @@ public class App {
             logger.error(e.getMessage(), e);
             throw new RuntimeException("Unable to load application properties.");
         }
+
+        Cache.getInstance().setProperties(properties);
         
         logger.info("Properties: {}", properties.toString());
         
