@@ -3,9 +3,10 @@ package com.tasos.jdbstart;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
-
+import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.logger.Log;
 
@@ -29,7 +30,8 @@ public class App {
             
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             
-            server.setExecutor(null);
+            server.createContext("/ping", new BasicController(connectionPool));
+            server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 
             Log.i("API listening at: %d", port);
