@@ -12,10 +12,12 @@ public class App {
         
         // @Cleanup: Remove flex call.
         // Log.flex();
+        
+        MainConnectionPool connectionPool = null;
 
         try {
             // @Todo: Retrieve from environment variable.
-            MainConnectionPool connectionPool = MainConnectionPool.create("jdbc:postgresql://localhost/jdbstart", "postgres", "postgres");
+            connectionPool = MainConnectionPool.create("jdbc:postgresql://localhost/jdbstart", "postgres", "postgres");
 
             Connection aConnection = connectionPool.getConnection();
             Connection bConnection = connectionPool.getConnection();
@@ -35,9 +37,10 @@ public class App {
             Log.i("Size of connection pool after releasing: %d", connectionPool.size());
             Log.i("Count of used connections after release: %d", connectionPool.countUsed());
 
-            connectionPool.shutdown();
         } catch (SQLException e) {
             Log.exc(e);
+        } finally {
+            if (connectionPool != null) connectionPool.shutdown();
         }
     }
 }

@@ -79,18 +79,22 @@ public class MainConnectionPool implements ConnectionPool {
     }
 
     @Override
-    public void shutdown() throws SQLException {
+    public void shutdown() {
         Log.d("Releasing connections...");
+        
+        try {
+            this.usedConnections.forEach(this::releaseConnection);
 
-        this.usedConnections.forEach(this::releaseConnection);
+            Log.d("Closing connections...");
 
-        Log.d("Closing connections...");
+            for (Connection connection: this.connectionPool) {
+                connection.close();
+            }
 
-        for (Connection connection: this.connectionPool) {
-            connection.close();
+            connectionPool.clear();
+        } catch (SQLException e) {
+            Log.exc(e);
         }
-
-        connectionPool.clear();
     }
 
         

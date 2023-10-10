@@ -24,7 +24,7 @@ public interface ConnectionPool {
     /*
      * Closes all the opened connections gracefully.
      */
-    void shutdown() throws SQLException;
+    void shutdown();
 
     /*
      * Returns the connection string.
