@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.db.QueryHandler;
 import com.tasos.jdbstart.logger.Log;
-import com.tasos.jdbstart.model.InsertRequest;
+import com.tasos.jdbstart.model.Stuff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,9 +37,9 @@ public class InsertController extends BasicController {
         
         int code = 200;
 
-        InsertRequest insertRequest = parse(httpExchange.getRequestBody(), InsertRequest.class);
+        Stuff stuff = parse(httpExchange.getRequestBody(), Stuff.class);
         
-        Log.i("Parsed request: %s", insertRequest.toString());
+        Log.i("Parsed request: %s", stuff.toString());
 
         String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
 
@@ -56,7 +56,7 @@ public class InsertController extends BasicController {
 
                 statement = connection.prepareStatement(s);
 
-                statement.setString(1, insertRequest.getPlaceholder());
+                statement.setString(1, stuff.getPlaceholder());
 
                 int result = statement.executeUpdate();
 
