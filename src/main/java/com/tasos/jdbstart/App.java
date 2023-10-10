@@ -1,7 +1,10 @@
 package com.tasos.jdbstart;
 
-import java.sql.Connection;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.sql.SQLException;
+
+import com.sun.net.httpserver.HttpServer;
 
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.logger.Log;
@@ -10,37 +13,47 @@ public class App {
     public static void main(String args[]) {
         Log.init(true);
         
-        // @Cleanup: Remove flex call.
-        // Log.flex();
-        
-        MainConnectionPool connectionPool = null;
+        String url = System.getenv("PGURL");
+        String user = System.getenv("PGUSR");
+        String password = System.getenv("PGPWD");
+
+        // @Refactor: Catch potential exception.
+        int port = Integer.parseInt(System.getenv("PORT"));
+
+        Log.i("PG Host: %s", url);
+        Log.i("PG user: %s", user);
+        Log.i("API port: %d", port);
 
         try {
-            // @Todo: Retrieve from environment variable.
-            connectionPool = MainConnectionPool.create("jdbc:postgresql://localhost/jdbstart", "postgres", "postgres");
-
-            Connection aConnection = connectionPool.getConnection();
-            Connection bConnection = connectionPool.getConnection();
-
-            Log.i("Initial size of connection pool: %d", connectionPool.size());
-            Log.i("Initial count of used connections: %d", connectionPool.countUsed());
-
-            boolean releaseResultA = connectionPool.releaseConnection(aConnection);
+            MainConnectionPool connectionPool = MainConnectionPool.create(url, user, password);
             
-            Log.i("Result of releasing connection A: %b", releaseResultA);
-            Log.i("Size of connection pool after releasing: %d", connectionPool.size());
-            Log.i("Count of used connections after release: %d", connectionPool.countUsed());
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            
+            server.setExecutor(null);
+            server.start();
 
-            boolean releaseResultB = connectionPool.releaseConnection(bConnection);
+            Log.i("API listening at: %d", port);
 
-            Log.i("Result of releasing connection B: %b", releaseResultB);
-            Log.i("Size of connection pool after releasing: %d", connectionPool.size());
-            Log.i("Count of used connections after release: %d", connectionPool.countUsed());
-
-        } catch (SQLException e) {
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(connectionPool));
+        } catch (SQLException | IOException e) {
             Log.exc(e);
-        } finally {
-            if (connectionPool != null) connectionPool.shutdown();
+        }
+    }
+    
+    /*
+     * Making shure that the connection pool will close each connection after application
+     * termination.
+     */
+    private static class ShutdownHook extends Thread {
+        MainConnectionPool pool;
+
+        ShutdownHook(MainConnectionPool pool) {
+            this.pool = pool;
+        }
+
+        @Override
+        public void run() {
+            if (this.pool != null) pool.shutdown();
         }
     }
 }
