@@ -7,7 +7,9 @@ build:
 
 run:
 	make build
-	java -Dlog4j2.configurationFile=log4j2.properties -jar target/tasos-bin-0.1.0.jar
+	cp src/main/java/com/tasos/jdbstart/config/application.properties target/
+	cp log4j2.properties target/
+	cd target/ && java -Dlog4j2.configurationFile=log4j2.properties -jar tasos-bin-0.1.0.jar && cd ..
 
 clean:
 	mvn clean

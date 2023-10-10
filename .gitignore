@@ -4,3 +4,4 @@ target/
 .project
 .env
 dependency-reduced-pom.xml
+src/main/java/com/tasos/jdbstart/config/application.properties
