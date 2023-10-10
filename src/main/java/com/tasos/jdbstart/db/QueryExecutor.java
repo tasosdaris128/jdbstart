@@ -1,7 +1,9 @@
 package com.tasos.jdbstart.db;
 
+import com.tasos.jdbstart.model.Response;
+
 public interface QueryExecutor {
 
-    public int execute(String sql, MainConnectionPool connectionPool);
+    public Response execute(String sql, MainConnectionPool connectionPool);
 
 }

@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.db.QueryHandler;
 import com.tasos.jdbstart.logger.Log;
+import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,8 +35,6 @@ public class InsertController extends BasicController {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         Log.i("Received request from: %s", httpExchange.getRemoteAddress().toString());
-        
-        int code = 200;
 
         Stuff stuff = parse(httpExchange.getRequestBody(), Stuff.class);
         
@@ -43,7 +42,7 @@ public class InsertController extends BasicController {
 
         String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
 
-        code = QueryHandler.query(sql, pool, (s, p) -> {
+        Response response = QueryHandler.query(sql, pool, (s, p) -> {
             Log.i("Executing: %s", s);
             
             int c = 200;
@@ -76,12 +75,10 @@ public class InsertController extends BasicController {
                 if (connection != null) p.releaseConnection(connection);
             }
 
-            return c;
+            return new Response(c, "OK");
         });
         
-        String message = "{\"message\":\"OK\"}";
-        
-        respond(httpExchange, code, message);
+        respond(httpExchange, response.getCode(), response.getBody().toString());
     }
 
 }

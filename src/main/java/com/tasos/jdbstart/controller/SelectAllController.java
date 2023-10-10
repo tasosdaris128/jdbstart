@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.db.QueryHandler;
 import com.tasos.jdbstart.logger.Log;
+import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -35,18 +38,18 @@ public class SelectAllController extends BasicController {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         Log.i("Received request from: %s", httpExchange.getRemoteAddress().toString());
-        
-        int code = 200;
-       
+
         String sql = "SELECT id, placeholder FROM stuff";
 
-        code = QueryHandler.query(sql, pool, (s, p) -> {
+        Response response = QueryHandler.query(sql, pool, (s, p) -> {
             Log.i("Executing: %s", s);
             
             int c = 200;
 
             Connection connection = null;
             PreparedStatement statement = null;
+
+            List<Stuff> stuffs = new ArrayList<>();
 
             try {
                 connection = p.getConnection();
@@ -58,6 +61,8 @@ public class SelectAllController extends BasicController {
                 while (result.next()) {
                     Stuff stuff = new Stuff(result.getInt(1), result.getString(2));
                     Log.d("Stuff: %s", stuff.toString());
+                    boolean addedToStuffs = stuffs.add(stuff);
+                    Log.d("Added to stuffs? %b", addedToStuffs);
                 }
             } catch (SQLException e) {
                 c = 500;
@@ -74,12 +79,10 @@ public class SelectAllController extends BasicController {
                 if (connection != null) p.releaseConnection(connection);
             }
 
-            return c;
+            return new Response(c, stuffs);
         });
         
-        String message = "{\"message\":\"OK\"}";
-        
-        respond(httpExchange, code, message);
+        respond(httpExchange, response.getCode(), response.getBody().toString());
     }
 
 }
