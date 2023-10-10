@@ -51,15 +51,27 @@ public class InsertController extends BasicController {
 
             try {
                 connection = p.getConnection();
+                
+                // Let's commit manually.
+                connection.setAutoCommit(false);
 
                 statement = connection.prepareStatement(s);
 
                 statement.setString(1, stuff.getPlaceholder());
 
                 int result = statement.executeUpdate();
+                
+                connection.commit();
 
                 logger.info("Query result: {}", result);
             } catch (SQLException e) {
+                
+                try {
+                    if (connection != null) connection.rollback();
+                } catch (SQLException se) {
+                    logger.error(se.getMessage(), se);
+                }
+                
                 c = 500;
                 logger.error(e.getMessage(), e);
             } finally {
