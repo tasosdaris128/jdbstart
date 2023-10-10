@@ -6,7 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tasos.jdbstart.logger.Log;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  *
@@ -14,7 +15,9 @@ import com.tasos.jdbstart.logger.Log;
  *
  */
 public class MainConnectionPool implements ConnectionPool {
-    
+
+    Logger logger = LogManager.getLogger(getClass());
+
     private String url;
     private String user;
     private String password;
@@ -50,7 +53,7 @@ public class MainConnectionPool implements ConnectionPool {
 
     @Override
     public Connection getConnection() throws SQLException {
-        Log.d("Acquiring connection...");
+        logger.info("Acquiring connection...");
 
         if (connectionPool.isEmpty()) {
             if (usedConnections.size() < MAX_POOL_SIZE) {
@@ -72,14 +75,14 @@ public class MainConnectionPool implements ConnectionPool {
 
         usedConnections.add(connection);
 
-        Log.d("Used connections: %d", countUsed());
+        logger.info("Used connections: {}", countUsed());
 
         return connection;
     }
 
     @Override
     public boolean releaseConnection(Connection connection) {
-        Log.d("Releasing connection...");
+        logger.info("Releasing connection...");
 
         connectionPool.add(connection);
 
@@ -88,12 +91,12 @@ public class MainConnectionPool implements ConnectionPool {
 
     @Override
     public void shutdown() {
-        Log.d("Releasing connections...");
+        logger.info("Releasing connections...");
         
         try {
             this.usedConnections.forEach(this::releaseConnection);
 
-            Log.d("Closing connections...");
+            logger.info("Closing connections...");
 
             for (Connection connection: this.connectionPool) {
                 connection.close();
@@ -101,7 +104,7 @@ public class MainConnectionPool implements ConnectionPool {
 
             connectionPool.clear();
         } catch (SQLException e) {
-            Log.exc(e);
+            logger.error(e.getMessage(), e);
         }
     }
 

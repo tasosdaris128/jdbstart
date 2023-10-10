@@ -10,11 +10,13 @@ import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.controller.InsertController;
 import com.tasos.jdbstart.controller.SelectAllController;
 import com.tasos.jdbstart.db.MainConnectionPool;
-import com.tasos.jdbstart.logger.Log;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class App {
     public static void main(String args[]) {
-        Log.init(true);
+        Logger logger = LogManager.getLogger(App.class);
         
         String url = System.getenv("PGURL");
         String user = System.getenv("PGUSR");
@@ -23,9 +25,9 @@ public class App {
         // @Refactor: Catch potential exception.
         int port = Integer.parseInt(System.getenv("PORT"));
 
-        Log.i("PG Host: %s", url);
-        Log.i("PG user: %s", user);
-        Log.i("API port: %d", port);
+        logger.info("PG Host: {}", url);
+        logger.info("PG user: {}", user);
+        logger.info("API port: {}", port);
 
         try {
             MainConnectionPool connectionPool = MainConnectionPool.create(url, user, password);
@@ -39,11 +41,11 @@ public class App {
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 
-            Log.i("API listening at: %d", port);
+            logger.info("API listening at: {}", port);
 
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(connectionPool));
         } catch (SQLException | IOException e) {
-            Log.exc(e);
+            logger.error(e.getMessage(), e);
         }
     }
     

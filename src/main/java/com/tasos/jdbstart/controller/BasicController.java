@@ -1,7 +1,6 @@
 package com.tasos.jdbstart.controller;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.tasos.jdbstart.logger.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,16 +14,20 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-
 import com.sun.net.httpserver.HttpExchange;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class BasicController implements HttpHandler {
-    
+
+    protected Logger logger = LogManager.getLogger(getClass());
+
     public BasicController() {}
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        Log.i("Received request from: %s", httpExchange.getRemoteAddress().toString());
+        logger.info("Received request from: {}", httpExchange.getRemoteAddress().toString());
 
         int code = 200;
         
@@ -45,7 +48,7 @@ public class BasicController implements HttpHandler {
             .lines()
             .collect(Collectors.joining("\n"));
         
-        Log.i("Request body: %s", requestBody);
+        logger.info("Request body: {}", requestBody);
 
         ObjectMapper mapper = new ObjectMapper();
 
