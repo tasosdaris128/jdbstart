@@ -50,6 +50,8 @@ public class MainConnectionPool implements ConnectionPool {
 
     @Override
     public Connection getConnection() throws SQLException {
+        Log.d("Acquiring connection...");
+
         if (connectionPool.isEmpty()) {
             if (usedConnections.size() < MAX_POOL_SIZE) {
                 connectionPool.add(createConnection(this.url, this.user, this.password));
@@ -66,13 +68,19 @@ public class MainConnectionPool implements ConnectionPool {
             connection = createConnection(this.url, this.user, this.password);
         }
 
+        connection.setAutoCommit(true);
+
         usedConnections.add(connection);
+
+        Log.d("Used connections: %d", countUsed());
 
         return connection;
     }
 
     @Override
     public boolean releaseConnection(Connection connection) {
+        Log.d("Releasing connection...");
+
         connectionPool.add(connection);
 
         return usedConnections.remove(connection);
