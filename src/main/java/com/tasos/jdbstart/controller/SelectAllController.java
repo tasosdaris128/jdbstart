@@ -64,6 +64,13 @@ public class SelectAllController extends BasicController {
                     logger.info("Added to stuffs? {}", addedToStuffs);
                 }
             } catch (SQLException e) {
+                
+                try {
+                    if (connection != null) connection.rollback();
+                } catch (SQLException se) {
+                    logger.error(se.getMessage(), se);
+                }
+                
                 c = 500;
                 logger.error(e.getMessage(), e);
             } finally {
