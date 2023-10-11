@@ -20,7 +20,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class SelectAllControllerImproved extends BasicController {
 
-    MainConnectionPool pool;
+    private MainConnectionPool pool;
 
     public SelectAllControllerImproved() {}
 

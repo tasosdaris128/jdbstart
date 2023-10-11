@@ -17,7 +17,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class InsertControllerImproved extends BasicController {
 
-    MainConnectionPool pool;
+    private MainConnectionPool pool;
 
     public InsertControllerImproved() {}
 
