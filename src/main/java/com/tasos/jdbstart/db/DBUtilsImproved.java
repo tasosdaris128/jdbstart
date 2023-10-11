@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -12,13 +14,13 @@ import com.tasos.jdbstart.utils.Cache;
 
 public class DBUtilsImproved {
     
-    public static void doInTranstaction(MainConnectionPool pool, ThrowingConsumer consumer) {
+    public static void doInTranstaction(DataSource dataSource, ThrowingConsumer consumer) {
         Logger logger = LogManager.getLogger(DBUtil.class);
 
         Connection connection = null;
 
         try {
-            connection = pool.getConnection();
+            connection = dataSource.getConnection();
 
             connection.setAutoCommit(false);
 
@@ -38,11 +40,17 @@ public class DBUtilsImproved {
             throw new RuntimeException("Unable to commit transaction.");
 
         } finally {
-            if (connection != null) pool.releaseConnection(connection);
+            
+            try {
+                if (connection != null) connection.close();;
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);    
+            }
+
         }
     }
 
-    public static <T> T doInTranstactionWithReturn(MainConnectionPool pool, ThrowingFunction<T> function) {
+    public static <T> T doInTranstactionWithReturn(DataSource dataSource, ThrowingFunction<T> function) {
         Logger logger = LogManager.getLogger(DBUtil.class);
 
         T element;
@@ -50,7 +58,7 @@ public class DBUtilsImproved {
         Connection connection = null;
 
         try {
-            connection = pool.getConnection();
+            connection = dataSource.getConnection();
 
             connection.setAutoCommit(false);
 
@@ -70,7 +78,13 @@ public class DBUtilsImproved {
             throw new RuntimeException("Unable to commit transaction.");
 
         } finally {
-            if (connection != null) pool.releaseConnection(connection);
+
+            try {
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+            }
+
         }
 
         return element;

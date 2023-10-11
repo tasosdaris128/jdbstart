@@ -13,9 +13,11 @@ import com.tasos.jdbstart.controller.InsertController;
 import com.tasos.jdbstart.controller.v2.InsertControllerImproved;
 import com.tasos.jdbstart.controller.SelectAllController;
 import com.tasos.jdbstart.controller.v2.SelectAllControllerImproved;
-import com.tasos.jdbstart.db.MainConnectionPool;
+import com.tasos.jdbstart.db.DataSourceGenerator;
 import com.tasos.jdbstart.utils.Cache;
 import com.tasos.jdbstart.utils.PropertyManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -51,23 +53,23 @@ public class App {
         logger.info("API port: {}", port);
 
         try {
-            MainConnectionPool connectionPool = MainConnectionPool.create(url, user, password);
+            HikariDataSource dataSource = DataSourceGenerator.generate(properties);
             
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             
             server.createContext("/ping", new BasicController());
             server.createContext("/insert", new InsertController(properties));
             server.createContext("/select", new SelectAllController(properties));
-            server.createContext("/v2/insert", new InsertControllerImproved(connectionPool));
-            server.createContext("/v2/select", new SelectAllControllerImproved(connectionPool));
+            server.createContext("/v2/insert", new InsertControllerImproved(dataSource));
+            server.createContext("/v2/select", new SelectAllControllerImproved(dataSource));
 
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
 
             logger.info("API listening at: {}", port);
 
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook(connectionPool));
-        } catch (SQLException | IOException e) {
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(dataSource));
+        } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -77,15 +79,15 @@ public class App {
      * termination.
      */
     private static class ShutdownHook extends Thread {
-        MainConnectionPool pool;
+        HikariDataSource dataSource;
 
-        ShutdownHook(MainConnectionPool pool) {
-            this.pool = pool;
+        ShutdownHook(HikariDataSource dataSource) {
+            this.dataSource = dataSource;
         }
 
         @Override
         public void run() {
-            if (this.pool != null) pool.shutdown();
+            if (this.dataSource != null) dataSource.close();
         }
     }
 }

@@ -3,7 +3,6 @@ package com.tasos.jdbstart.controller.v2;
 import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.db.DBUtilsImproved;
-import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
@@ -13,16 +12,18 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+import javax.sql.DataSource;
+
 import com.sun.net.httpserver.HttpExchange;
 
 public class InsertControllerImproved extends BasicController {
 
-    private MainConnectionPool pool;
+    private DataSource dataSource;
 
     public InsertControllerImproved() {}
 
-    public InsertControllerImproved(MainConnectionPool pool) {
-        this.pool = pool;
+    public InsertControllerImproved(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class InsertControllerImproved extends BasicController {
 
         String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
         
-        DBUtilsImproved.doInTranstaction(pool, (conn) -> {
+        DBUtilsImproved.doInTranstaction(dataSource, (conn) -> {
             PreparedStatement statement = conn.prepareStatement(sql);
 
             statement.setString(1, stuff.getPlaceholder());
