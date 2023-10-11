@@ -16,6 +16,6 @@ same behavior as the transactional annotation of the spring framework.
 
 ## Pending Items
 
-- [ ] Replace custom connection pool with Hickari.
+- [X] Replace custom connection pool with Hickari.
 - [ ] Create tests for DBUtil and DBUtilsImproved.
 - [ ] Implement nested transactions support.
