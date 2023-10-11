@@ -12,15 +12,9 @@ import com.tasos.jdbstart.utils.Cache;
 
 public class DBUtil {
     
-    public static void doInTranstaction(ThrowingConsumer consumer) {
+    public static void doInTranstaction(Properties properties, ThrowingConsumer consumer) {
         Logger logger = LogManager.getLogger(DBUtil.class);
-
-        Properties properties = Cache.getInstance().getProperties();
-
-        if (properties == null) {
-            throw new RuntimeException("Unable to get access to the application properties.");
-        }
-
+        
         Connection connection = null;
 
         try {
@@ -58,16 +52,9 @@ public class DBUtil {
         }
     }
 
-    public static <T> T doInTranstactionWithReturn(ThrowingFunction<T> function) {
+    public static <T> T doInTranstactionWithReturn(Properties properties, ThrowingFunction<T> function) {
         Logger logger = LogManager.getLogger(DBUtil.class);
         
-        // @Refactor: I don't like that it depends on the cache object.
-        Properties properties = Cache.getInstance().getProperties();
-
-        if (properties == null) {
-            throw new RuntimeException("Unable to get access to the application properties.");
-        }
-
         T element;
 
         Connection connection = null;

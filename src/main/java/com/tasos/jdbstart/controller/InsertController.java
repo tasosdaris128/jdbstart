@@ -10,12 +10,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.Properties;
 
 import com.sun.net.httpserver.HttpExchange;
 
 public class InsertController extends BasicController {
 
+    private Properties properties;
+
     public InsertController() {}
+
+    public InsertController(Properties properties) {
+        this.properties = properties;
+    }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -27,7 +34,7 @@ public class InsertController extends BasicController {
 
         String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
         
-        DBUtil.doInTranstaction(conn -> {
+        DBUtil.doInTranstaction(properties, (conn) -> {
             PreparedStatement statement = conn.prepareStatement(sql);
 
             statement.setString(1, stuff.getPlaceholder());
