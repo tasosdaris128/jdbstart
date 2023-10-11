@@ -13,3 +13,9 @@ and rollback mechanism, and the proper connection opening and closing as well.
 same behavior as the transactional annotation of the spring framework. 
 
 **Note**: Connection pool should be used in order to test the auto-commit of the JDBC driver.
+
+## Pending Items
+
+- [ ] Replace custom connection pool with Hickari.
+- [ ] Create tests for DBUtil and DBUtilsImproved.
+- [ ] Implement nested transactions support.
