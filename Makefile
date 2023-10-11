@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 all: run
 
 build:
@@ -18,4 +20,4 @@ clean:
 
 test:
 	clear
-	mvn test
+	source .env && mvn test
