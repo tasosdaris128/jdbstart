@@ -10,25 +10,15 @@ import org.apache.logging.log4j.LogManager;
 
 import com.tasos.jdbstart.utils.Cache;
 
-public class DBUtil {
+public class DBUtilsImproved {
     
-    public static void doInTranstaction(ThrowingConsumer consumer) {
+    public static void doInTranstaction(MainConnectionPool pool, ThrowingConsumer consumer) {
         Logger logger = LogManager.getLogger(DBUtil.class);
-
-        Properties properties = Cache.getInstance().getProperties();
-
-        if (properties == null) {
-            throw new RuntimeException("Unable to get access to the application properties.");
-        }
 
         Connection connection = null;
 
         try {
-            connection = DriverManager.getConnection(
-                properties.getProperty("url", ""),
-                properties.getProperty("user", ""),
-                properties.getProperty("password", "")
-            );
+            connection = pool.getConnection();
 
             connection.setAutoCommit(false);
 
@@ -48,36 +38,19 @@ public class DBUtil {
             throw new RuntimeException("Unable to commit transaction.");
 
         } finally {
-            
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
-
+            if (connection != null) pool.releaseConnection(connection);
         }
     }
 
-    public static <T> T doInTranstactionWithReturn(ThrowingFunction<T> function) {
+    public static <T> T doInTranstactionWithReturn(MainConnectionPool pool, ThrowingFunction<T> function) {
         Logger logger = LogManager.getLogger(DBUtil.class);
-        
-        // @Refactor: I don't like that it depends on the cache object.
-        Properties properties = Cache.getInstance().getProperties();
-
-        if (properties == null) {
-            throw new RuntimeException("Unable to get access to the application properties.");
-        }
 
         T element;
 
         Connection connection = null;
 
         try {
-            connection = DriverManager.getConnection(
-                properties.getProperty("url", ""),
-                properties.getProperty("user", ""),
-                properties.getProperty("password", "")
-            );
+            connection = pool.getConnection();
 
             connection.setAutoCommit(false);
 
@@ -97,13 +70,7 @@ public class DBUtil {
             throw new RuntimeException("Unable to commit transaction.");
 
         } finally {
-            
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
-
+            if (connection != null) pool.releaseConnection(connection);
         }
 
         return element;

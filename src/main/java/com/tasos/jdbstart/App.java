@@ -10,7 +10,9 @@ import java.util.concurrent.Executors;
 import com.sun.net.httpserver.HttpServer;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.controller.InsertController;
+import com.tasos.jdbstart.controller.v2.InsertControllerImproved;
 import com.tasos.jdbstart.controller.SelectAllController;
+import com.tasos.jdbstart.controller.v2.SelectAllControllerImproved;
 import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.utils.Cache;
 import com.tasos.jdbstart.utils.PropertyManager;
@@ -56,6 +58,8 @@ public class App {
             server.createContext("/ping", new BasicController());
             server.createContext("/insert", new InsertController());
             server.createContext("/select", new SelectAllController());
+            server.createContext("/v2/insert", new InsertControllerImproved(connectionPool));
+            server.createContext("/v2/select", new SelectAllControllerImproved(connectionPool));
 
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
