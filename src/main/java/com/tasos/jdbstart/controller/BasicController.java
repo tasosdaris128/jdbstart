@@ -53,6 +53,8 @@ public class BasicController implements HttpHandler {
         ObjectMapper mapper = new ObjectMapper();
 
         T o = mapper.readValue(requestBody, valueType);
+        
+        logger.info("parse() -> {}", o.toString());
 
         return o;
     }

@@ -54,8 +54,8 @@ public class App {
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             
             server.createContext("/ping", new BasicController());
-            server.createContext("/insert", new InsertController(connectionPool));
-            server.createContext("/select", new SelectAllController(connectionPool));
+            server.createContext("/insert", new InsertController());
+            server.createContext("/select", new SelectAllController());
 
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
