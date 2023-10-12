@@ -13,10 +13,10 @@ import org.apache.logging.log4j.LogManager;
 import com.tasos.jdbstart.utils.Cache;
 
 public class DBUtilsImproved {
-    
-    public static void doInTranstaction(DataSource dataSource, ThrowingConsumer consumer) {
-        Logger logger = LogManager.getLogger(DBUtil.class);
+    private static Logger logger = LogManager.getLogger(DBUtilsImproved.class);
 
+    public static void doInTranstaction(DataSource dataSource, ThrowingConsumer consumer) {
+       
         Connection connection = null;
 
         try {
@@ -51,7 +51,6 @@ public class DBUtilsImproved {
     }
 
     public static <T> T doInTranstactionWithReturn(DataSource dataSource, ThrowingFunction<T> function) {
-        Logger logger = LogManager.getLogger(DBUtil.class);
 
         T element;
 

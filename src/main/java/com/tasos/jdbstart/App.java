@@ -24,8 +24,9 @@ import org.apache.logging.log4j.LogManager;
 
 public class App {
 
+    private static Logger logger = LogManager.getLogger(App.class);
+
     public static void main(String args[]) {
-        Logger logger = LogManager.getLogger(App.class);
 
         Properties properties;
 

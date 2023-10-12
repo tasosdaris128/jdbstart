@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class MainConnectionPool implements ConnectionPool {
 
-    Logger logger = LogManager.getLogger(getClass());
+    private static Logger logger = LogManager.getLogger(MainConnectionPool.class);
 
     private String url;
     private String user;

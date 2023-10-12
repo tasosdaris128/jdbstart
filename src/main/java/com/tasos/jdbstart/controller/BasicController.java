@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager;
 
 public class BasicController implements HttpHandler {
 
-    protected Logger logger = LogManager.getLogger(getClass());
+    protected static Logger logger = LogManager.getLogger(BasicController.class);
 
     public BasicController() {}
 
