@@ -71,7 +71,7 @@ public class MainConnectionPool implements ConnectionPool {
             connection = createConnection(this.url, this.user, this.password);
         }
 
-        connection.setAutoCommit(true);
+        connection.setAutoCommit(false);
 
         usedConnections.add(connection);
 
