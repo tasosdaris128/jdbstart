@@ -3,6 +3,7 @@ package com.tasos.jdbstart.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.Properties;
 
 import org.apache.logging.log4j.Logger;
@@ -16,6 +17,7 @@ public class DBUtil {
     public static void doInTranstaction(Properties properties, ThrowingConsumer consumer) {
         
         Connection connection = null;
+        Savepoint beforeConsumption = null;
 
         try {
             connection = DriverManager.getConnection(
@@ -26,15 +28,28 @@ public class DBUtil {
 
             connection.setAutoCommit(false);
 
+            beforeConsumption = connection.setSavepoint("beforeConsumption");
+
             consumer.consume(connection);
 
             connection.commit();
         } catch (Exception e) {
             
-            try {
-                if (connection != null) connection.rollback();
-            } catch (SQLException se) {
-                logger.error(se.getMessage(), se); 
+            rollbackToSavePoint: {
+                try {
+
+                    if (connection == null) break rollbackToSavePoint;
+
+                    if (beforeConsumption != null) {
+                        connection.rollback(beforeConsumption);
+                        break rollbackToSavePoint;
+                    }
+
+                    connection.rollback();
+
+                } catch (SQLException se) {
+                    logger.error(se.getMessage(), se); 
+                }
             }
 
             logger.error(e.getMessage(), e);
@@ -57,6 +72,7 @@ public class DBUtil {
         T element;
 
         Connection connection = null;
+        Savepoint beforeFunction = null;
 
         try {
             connection = DriverManager.getConnection(
@@ -67,15 +83,28 @@ public class DBUtil {
 
             connection.setAutoCommit(false);
 
+            beforeFunction = connection.setSavepoint("beforeFunction");
+
             element = function.executeAndReturn(connection);
 
             connection.commit();
         } catch (Exception e) {
             
-            try {
-                if (connection != null) connection.rollback();
-            } catch (SQLException se) {
-                logger.error(se.getMessage(), se); 
+            rollbackToSavePoint: {
+                try {
+
+                    if (connection == null) break rollbackToSavePoint;
+
+                    if (beforeFunction != null) {
+                        connection.rollback(beforeFunction);
+                        break rollbackToSavePoint;
+                    }
+
+                    connection.rollback();
+
+                } catch (SQLException se) {
+                    logger.error(se.getMessage(), se); 
+                }
             }
 
             logger.error(e.getMessage(), e);
