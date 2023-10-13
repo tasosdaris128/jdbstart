@@ -32,18 +32,30 @@ public class InsertController extends BasicController {
         
         logger.info("Parsed request: {}", stuff.toString());
 
-        String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
+        final String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
         
-        DBUtil.doInTranstaction(properties, (conn) -> {
-            PreparedStatement statement = conn.prepareStatement(sql);
+        DBUtil.doInTranstaction(properties, (outerConn) -> {
+            PreparedStatement outerStatement = outerConn.prepareStatement(sql);
 
-            statement.setString(1, stuff.getPlaceholder());
+            outerStatement.setString(1, stuff.getPlaceholder());
 
-            int result = statement.executeUpdate();
+            int outerResult = outerStatement.executeUpdate();
 
-            logger.info("Query result: {}", result);
+            DBUtil.doInTranstaction(properties, (innerConn) -> {
+                PreparedStatement innerStatement = innerConn.prepareStatement(sql);
 
-            if (statement != null) statement.close();
+                innerStatement.setString(1, stuff.getPlaceholder());
+
+                int innerResult = innerStatement.executeUpdate();
+
+                logger.info("Inner query result: {}", innerResult);
+
+                if (innerStatement != null) innerStatement.close();
+            });
+
+            logger.info("Outer query result: {}", outerResult);
+
+            if (outerStatement != null) outerStatement.close();
         });
 
         Response response = new Response(200, "{\"code\": 200, \"message\": \"OK\"}");
