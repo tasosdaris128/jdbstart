@@ -14,7 +14,7 @@ import com.tasos.jdbstart.utils.Cache;
 public class DBUtil {
     private static Logger logger = LogManager.getLogger(DBUtil.class);
 
-    public static void doInTranstaction(Properties properties, ThrowingConsumer consumer) {
+    public static synchronized void doInTranstaction(Properties properties, ThrowingConsumer consumer) {
         
         Connection connection = null;
         Savepoint beforeConsumption = null;
@@ -67,7 +67,7 @@ public class DBUtil {
         }
     }
 
-    public static <T> T doInTranstactionWithReturn(Properties properties, ThrowingFunction<T> function) {
+    public static synchronized <T> T doInTranstactionWithReturn(Properties properties, ThrowingFunction<T> function) {
         
         T element;
 
