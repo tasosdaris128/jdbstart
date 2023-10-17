@@ -14,7 +14,7 @@ import com.tasos.jdbstart.controller.v2.InsertControllerImproved;
 import com.tasos.jdbstart.controller.SelectAllController;
 import com.tasos.jdbstart.controller.v2.SelectAllControllerImproved;
 import com.tasos.jdbstart.db.DataSourceGenerator;
-import com.tasos.jdbstart.utils.Cache;
+import com.tasos.jdbstart.utils.ApplicationContext;
 import com.tasos.jdbstart.utils.PropertyManager;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -38,7 +38,7 @@ public class App {
             throw new RuntimeException("Unable to load application properties.");
         }
 
-        Cache.getInstance().setProperties(properties);
+        ApplicationContext.getInstance().setProperties(properties);
         
         logger.info("Properties: {}", properties.toString());
         

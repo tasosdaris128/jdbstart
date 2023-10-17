@@ -2,16 +2,16 @@ package com.tasos.jdbstart.utils;
 
 import java.util.Properties;
 
-public class Cache {
+public class ApplicationContext {
 
     private volatile Properties properties;
 
-    private static Cache instance;
+    private static ApplicationContext instance;
 
-    private Cache() {}
+    private ApplicationContext() {}
 
-    public static synchronized Cache getInstance() {
-        if (instance == null) instance = new Cache();
+    public static synchronized ApplicationContext getInstance() {
+        if (instance == null) instance = new ApplicationContext();
 
         return instance;
     }
