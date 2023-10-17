@@ -71,7 +71,7 @@ public class App {
 
             logger.info("API listening at: {}", port);
 
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook(dataSource));
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(dataSource, server));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -83,14 +83,18 @@ public class App {
      */
     private static class ShutdownHook extends Thread {
         HikariDataSource dataSource;
+        HttpServer server;
 
-        ShutdownHook(HikariDataSource dataSource) {
+        ShutdownHook(HikariDataSource dataSource, HttpServer server) {
             this.dataSource = dataSource;
+            this.server = server;
         }
 
         @Override
         public void run() {
+            logger.info("Gracefully shutting down the server. Goodbye!");
             if (this.dataSource != null) dataSource.close();
+            if (this.server != null) server.stop(1);
         }
     }
 }
