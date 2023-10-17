@@ -9,8 +9,6 @@ import java.util.Properties;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.tasos.jdbstart.utils.Cache;
-
 public class DBUtil {
     private static Logger logger = LogManager.getLogger(DBUtil.class);
 

@@ -11,8 +11,6 @@ import javax.sql.DataSource;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.tasos.jdbstart.utils.Cache;
-
 public class DBUtilsImproved {
     private static Logger logger = LogManager.getLogger(DBUtilsImproved.class);
 
