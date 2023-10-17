@@ -12,110 +12,120 @@ import org.apache.logging.log4j.LogManager;
 public class DBUtil {
     private static Logger logger = LogManager.getLogger(DBUtil.class);
 
-    public static synchronized void doInTranstaction(Properties properties, ThrowingConsumer consumer) {
-        
-        Connection connection = null;
-        Savepoint beforeConsumption = null;
+    public static void begin() {
+        logger.info("Begin transtaction...");
 
         try {
-            connection = DriverManager.getConnection(
-                properties.getProperty("url", ""),
-                properties.getProperty("user", ""),
-                properties.getProperty("password", "")
-            );
+
+            ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            holder.createSavepoint();
+
+            ConnectionManager.upateConnectionHolder(holder);
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public static void end() {
+        logger.info("End transaction...");
+
+        try {
+
+            ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            Connection connection = holder.getConnection();
+
+            if (connection != null) {
+
+                try {
+                    logger.info("Committing transaction...");
+                    connection.commit();
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                    
+                    try {
+
+                        Savepoint savepoint = holder.getSavepoint();
+
+                        if (savepoint != null) {
+                            connection.rollback(savepoint);
+                        } else {
+                            connection.rollback();
+                        }
+
+                    } catch (SQLException se) {
+                        logger.error(se.getMessage(), se);
+                    }
+
+                } finally {
+                    connection.close();
+                }
+
+            }
+
+            ConnectionManager.clear();
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public static synchronized void doInTranstaction(ThrowingConsumer consumer) {
+
+        try {
+            
+            ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            Connection connection = holder.getConnection();
 
             connection.setAutoCommit(false);
 
-            beforeConsumption = connection.setSavepoint("beforeConsumption");
+            holder.createSavepoint();
+
+            ConnectionManager.upateConnectionHolder(holder);
 
             consumer.consume(connection);
 
-            connection.commit();
+            ConnectionManager.upateConnectionHolder(holder);
+
         } catch (Exception e) {
             
-            rollbackToSavePoint: {
-                try {
-
-                    if (connection == null) break rollbackToSavePoint;
-
-                    if (beforeConsumption != null) {
-                        connection.rollback(beforeConsumption);
-                        break rollbackToSavePoint;
-                    }
-
-                    connection.rollback();
-
-                } catch (SQLException se) {
-                    logger.error(se.getMessage(), se); 
-                }
-            }
-
             logger.error(e.getMessage(), e);
 
-            throw new RuntimeException("Unable to commit transaction.");
-
-        } finally {
-            
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
+            throw new RuntimeException("Unable to consume connection.");
 
         }
     }
 
-    public static synchronized <T> T doInTranstactionWithReturn(Properties properties, ThrowingFunction<T> function) {
+    public static synchronized <T> T doInTranstactionWithReturn(ThrowingFunction<T> function) {
         
-        T element;
-
-        Connection connection = null;
-        Savepoint beforeFunction = null;
+        T element = null;
 
         try {
-            connection = DriverManager.getConnection(
-                properties.getProperty("url", ""),
-                properties.getProperty("user", ""),
-                properties.getProperty("password", "")
-            );
+
+            ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            Connection connection = holder.getConnection();
 
             connection.setAutoCommit(false);
 
-            beforeFunction = connection.setSavepoint("beforeFunction");
+            holder.createSavepoint();
+
+            ConnectionManager.upateConnectionHolder(holder);
 
             element = function.executeAndReturn(connection);
 
             connection.commit();
+
+            ConnectionManager.upateConnectionHolder(holder);
+
         } catch (Exception e) {
             
-            rollbackToSavePoint: {
-                try {
-
-                    if (connection == null) break rollbackToSavePoint;
-
-                    if (beforeFunction != null) {
-                        connection.rollback(beforeFunction);
-                        break rollbackToSavePoint;
-                    }
-
-                    connection.rollback();
-
-                } catch (SQLException se) {
-                    logger.error(se.getMessage(), se); 
-                }
-            }
-
             logger.error(e.getMessage(), e);
 
-            throw new RuntimeException("Unable to commit transaction.");
-
-        } finally {
-            
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);
-            }
+            throw new RuntimeException("Unable to consume connection with return.");
 
         }
 

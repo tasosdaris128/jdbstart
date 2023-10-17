@@ -38,7 +38,7 @@ public class App {
             throw new RuntimeException("Unable to load application properties.");
         }
 
-        ApplicationContext.getInstance().setProperties(properties);
+        ApplicationContext.properties(properties);
         
         logger.info("Properties: {}", properties.toString());
         
@@ -55,12 +55,14 @@ public class App {
 
         try {
             HikariDataSource dataSource = DataSourceGenerator.generate(properties);
-            
+
+            ApplicationContext.dataSource(dataSource);
+
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             
             server.createContext("/ping", new BasicController());
-            server.createContext("/insert", new InsertController(properties));
-            server.createContext("/select", new SelectAllController(properties));
+            server.createContext("/insert", new InsertController());
+            server.createContext("/select", new SelectAllController());
             server.createContext("/v2/insert", new InsertControllerImproved(dataSource));
             server.createContext("/v2/select", new SelectAllControllerImproved(dataSource));
 

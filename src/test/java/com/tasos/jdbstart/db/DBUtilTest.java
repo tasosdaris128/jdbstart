@@ -1,7 +1,12 @@
 package com.tasos.jdbstart.db;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import com.tasos.jdbstart.utils.ApplicationContext;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,9 +15,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 public class DBUtilTest {
 
     private Properties properties;
+
+    private HikariDataSource dataSource;
 
     @BeforeEach
     public void setup() {
@@ -20,6 +29,15 @@ public class DBUtilTest {
         properties.setProperty("url", System.getenv("PGURL"));
         properties.setProperty("user", System.getenv("PGUSR"));
         properties.setProperty("password", System.getenv("PGPWD"));
+        dataSource = DataSourceGenerator.generate(properties);
+        ApplicationContext.properties(properties);
+        ApplicationContext.dataSource(dataSource);
+        DBUtil.begin();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        DBUtil.end();
     }
 
     // The following two tests are just to ensure that we have properly
@@ -43,21 +61,21 @@ public class DBUtilTest {
 
     @Test
     public void doInTransaction_testThatTheConnectionIsNotNull() {
-        DBUtil.doInTranstaction(properties, (conn) -> {
+        DBUtil.doInTranstaction((conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
         });
     }
 
     @Test
     public void doInTransaction_testThatTheConnectionIsValid() {
-        DBUtil.doInTranstaction(properties, (conn) -> {
+        DBUtil.doInTranstaction((conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
         });
     }
     
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsNotNull() {
-        DBUtil.doInTranstactionWithReturn(properties, (conn) -> {
+        DBUtil.doInTranstactionWithReturn((conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
 
             return null;
@@ -66,7 +84,7 @@ public class DBUtilTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsValid() {
-        DBUtil.doInTranstactionWithReturn(properties, (conn) -> {
+        DBUtil.doInTranstactionWithReturn((conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
 
             return null;
@@ -75,7 +93,7 @@ public class DBUtilTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheFunctionReturnsObject() {
-        Object o = DBUtil.doInTranstactionWithReturn(properties, (conn) -> {
+        Object o = DBUtil.doInTranstactionWithReturn((conn) -> {
             return new Object();
         });
 

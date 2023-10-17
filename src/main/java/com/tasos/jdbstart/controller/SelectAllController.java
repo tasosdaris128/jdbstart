@@ -14,19 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import com.sun.net.httpserver.HttpExchange;
 
 public class SelectAllController extends BasicController {
 
-    private Properties properties;
-
     public SelectAllController() {}
-
-    public SelectAllController(Properties properties) {
-        this.properties = properties;
-    }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -36,7 +29,9 @@ public class SelectAllController extends BasicController {
 
         String sql = "SELECT id, placeholder FROM stuff";
 
-        List<Stuff> stuffs = DBUtil.doInTranstactionWithReturn(properties, (conn) -> {
+        DBUtil.begin();
+
+        List<Stuff> stuffs = DBUtil.doInTranstactionWithReturn((conn) -> {
             List<Stuff> s = new ArrayList<>();
 
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -52,6 +47,8 @@ public class SelectAllController extends BasicController {
 
             return s;
         });
+
+        DBUtil.end();
 
         prepareResponse: {
             if (stuffs == null) {
