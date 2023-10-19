@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 
 public class ConnectionHolder {
 
-    private static Logger logger = LogManager.getLogger(ConnectionHolder.class);
+    private static final Logger logger = LogManager.getLogger(ConnectionHolder.class);
 
     private final static String SAVEPOINT_PREFIX = "SAVEPOINT_";
 

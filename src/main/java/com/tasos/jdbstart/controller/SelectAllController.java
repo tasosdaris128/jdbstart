@@ -1,15 +1,10 @@
 package com.tasos.jdbstart.controller;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.db.DBUtil;
-import com.tasos.jdbstart.db.MainConnectionPool;
 import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -31,7 +26,7 @@ public class SelectAllController extends BasicController {
 
         DBUtil.begin();
 
-        List<Stuff> stuffs = DBUtil.doInTranstactionWithReturn((conn) -> {
+        List<Stuff> stuffs = DBUtil.doInTransactionWithReturn((conn) -> {
             List<Stuff> s = new ArrayList<>();
 
             PreparedStatement statement = conn.prepareStatement(sql);

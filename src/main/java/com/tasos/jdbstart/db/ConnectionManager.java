@@ -1,12 +1,10 @@
 package com.tasos.jdbstart.db;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import com.tasos.jdbstart.utils.ApplicationContext;
 import com.tasos.jdbstart.utils.NamedThreadLocal;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
 
 public abstract class ConnectionManager {
 
@@ -30,7 +28,7 @@ public abstract class ConnectionManager {
         return holder;
     }
 
-    public static void upateConnectionHolder(ConnectionHolder holder) {
+    public static void updateConnectionHolder(ConnectionHolder holder) {
         connectionInTransaction.remove();
         connectionInTransaction.set(holder);
     }

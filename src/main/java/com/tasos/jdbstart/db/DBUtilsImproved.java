@@ -1,10 +1,8 @@
 package com.tasos.jdbstart.db;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Savepoint;
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -12,9 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class DBUtilsImproved {
-    private static Logger logger = LogManager.getLogger(DBUtilsImproved.class);
+    private static final Logger logger = LogManager.getLogger(DBUtilsImproved.class);
 
-    public static synchronized void doInTranstaction(DataSource dataSource, ThrowingConsumer consumer) {
+    public static synchronized void doInTransaction(DataSource dataSource, ThrowingConsumer consumer) {
        
         Connection connection = null;
         Savepoint beforeConsumption = null;
@@ -55,7 +53,7 @@ public class DBUtilsImproved {
         } finally {
             
             try {
-                if (connection != null) connection.close();;
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);    
             }
@@ -63,7 +61,7 @@ public class DBUtilsImproved {
         }
     }
 
-    public static synchronized <T> T doInTranstactionWithReturn(DataSource dataSource, ThrowingFunction<T> function) {
+    public static synchronized <T> T doInTransactionWithReturn(DataSource dataSource, ThrowingFunction<T> function) {
 
         T element;
 

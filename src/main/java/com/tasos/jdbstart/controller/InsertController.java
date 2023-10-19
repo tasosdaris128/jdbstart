@@ -1,14 +1,10 @@
 package com.tasos.jdbstart.controller;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.tasos.jdbstart.db.DBUtil;
 import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -30,14 +26,14 @@ public class InsertController extends BasicController {
 
         DBUtil.begin();
 
-        DBUtil.doInTranstaction((outerConn) -> {
+        DBUtil.doInTransaction((outerConn) -> {
             PreparedStatement outerStatement = outerConn.prepareStatement(outerSql);
 
             outerStatement.setString(1, stuff.getPlaceholder());
 
             int outerResult = outerStatement.executeUpdate();
 
-            DBUtil.doInTranstaction((innerConn) -> {
+            DBUtil.doInTransaction((innerConn) -> {
                 PreparedStatement innerStatement = innerConn.prepareStatement(innerSql);
 
                 innerStatement.setString(1, stuff.getPlaceholder());

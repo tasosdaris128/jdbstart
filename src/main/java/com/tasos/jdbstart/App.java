@@ -1,32 +1,29 @@
 package com.tasos.jdbstart;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-
 import com.sun.net.httpserver.HttpServer;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.controller.InsertController;
-import com.tasos.jdbstart.controller.v2.InsertControllerImproved;
 import com.tasos.jdbstart.controller.SelectAllController;
+import com.tasos.jdbstart.controller.v2.InsertControllerImproved;
 import com.tasos.jdbstart.controller.v2.SelectAllControllerImproved;
 import com.tasos.jdbstart.db.DataSourceGenerator;
 import com.tasos.jdbstart.utils.ApplicationContext;
 import com.tasos.jdbstart.utils.PropertyManager;
-
 import com.zaxxer.hikari.HikariDataSource;
-
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Properties;
+import java.util.concurrent.Executors;
 
 public class App {
 
-    private static Logger logger = LogManager.getLogger(App.class);
+    private static final Logger logger = LogManager.getLogger(App.class);
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         Properties properties;
 
@@ -78,7 +75,7 @@ public class App {
     }
     
     /*
-     * Making shure that the connection pool will close each connection after application
+     * Making sure that the connection pool will close each connection after application
      * termination.
      */
     private static class ShutdownHook extends Thread {

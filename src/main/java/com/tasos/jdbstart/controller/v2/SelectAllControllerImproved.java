@@ -1,23 +1,17 @@
 package com.tasos.jdbstart.controller.v2;
 
-import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.db.DBUtilsImproved;
 import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.sql.DataSource;
-
-import com.sun.net.httpserver.HttpExchange;
 
 public class SelectAllControllerImproved extends BasicController {
 
@@ -37,7 +31,7 @@ public class SelectAllControllerImproved extends BasicController {
 
         String sql = "SELECT id, placeholder FROM stuff";
 
-        List<Stuff> stuffs = DBUtilsImproved.doInTranstactionWithReturn(dataSource, (conn) -> {
+        List<Stuff> stuffs = DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
             List<Stuff> s = new ArrayList<>();
 
             PreparedStatement statement = conn.prepareStatement(sql);

@@ -1,13 +1,13 @@
 package com.tasos.jdbstart.db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 /*
  *
@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class MainConnectionPool implements ConnectionPool {
 
-    private static Logger logger = LogManager.getLogger(MainConnectionPool.class);
+    private static final Logger logger = LogManager.getLogger(MainConnectionPool.class);
 
     private String url;
     private String user;
@@ -25,9 +25,9 @@ public class MainConnectionPool implements ConnectionPool {
     private List<Connection> connectionPool;
     private List<Connection> usedConnections = new ArrayList<>();
 
-    private static int POOL_SIZE = 30;
-    private static int MAX_POOL_SIZE = 60;
-    private static int MAX_TIMEOUT = 30;
+    private static final int POOL_SIZE = 30;
+    private static final int MAX_POOL_SIZE = 60;
+    private static final int MAX_TIMEOUT = 30;
 
     public static MainConnectionPool create(String url, String user, String password) throws SQLException {
 

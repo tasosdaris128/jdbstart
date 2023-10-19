@@ -49,21 +49,21 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void doInTransaction_testThatTheConnectionIsNotNull() {
-        DBUtilsImproved.doInTranstaction(dataSource, (conn) -> {
+        DBUtilsImproved.doInTransaction(dataSource, (conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
         });
     }
 
     @Test
     public void doInTransaction_testThatTheConnectionIsValid() {
-        DBUtilsImproved.doInTranstaction(dataSource, (conn) -> {
+        DBUtilsImproved.doInTransaction(dataSource, (conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
         });
     }
     
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsNotNull() {
-        DBUtilsImproved.doInTranstactionWithReturn(dataSource, (conn) -> {
+        DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
 
             return null;
@@ -72,7 +72,7 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsValid() {
-        DBUtilsImproved.doInTranstactionWithReturn(dataSource, (conn) -> {
+        DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
 
             return null;
@@ -81,7 +81,7 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheFunctionReturnsObject() {
-        Object o = DBUtilsImproved.doInTranstactionWithReturn(dataSource, (conn) -> {
+        Object o = DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
             return new Object();
         });
 

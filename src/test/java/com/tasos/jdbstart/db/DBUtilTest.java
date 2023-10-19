@@ -15,8 +15,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 public class DBUtilTest {
 
     private Properties properties;
@@ -61,21 +59,21 @@ public class DBUtilTest {
 
     @Test
     public void doInTransaction_testThatTheConnectionIsNotNull() {
-        DBUtil.doInTranstaction((conn) -> {
+        DBUtil.doInTransaction((conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
         });
     }
 
     @Test
     public void doInTransaction_testThatTheConnectionIsValid() {
-        DBUtil.doInTranstaction((conn) -> {
+        DBUtil.doInTransaction((conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
         });
     }
     
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsNotNull() {
-        DBUtil.doInTranstactionWithReturn((conn) -> {
+        DBUtil.doInTransactionWithReturn((conn) -> {
             assertNotNull(conn, () -> "Connection should not be null.");
 
             return null;
@@ -84,7 +82,7 @@ public class DBUtilTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsValid() {
-        DBUtil.doInTranstactionWithReturn((conn) -> {
+        DBUtil.doInTransactionWithReturn((conn) -> {
             assertTrue(conn.isValid(10), "Connection to DB is not valid.");
 
             return null;
@@ -93,7 +91,7 @@ public class DBUtilTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheFunctionReturnsObject() {
-        Object o = DBUtil.doInTranstactionWithReturn((conn) -> {
+        Object o = DBUtil.doInTransactionWithReturn((conn) -> {
             return new Object();
         });
 

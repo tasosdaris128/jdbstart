@@ -5,8 +5,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 public class DataSourceGenerator {
    
     public static HikariDataSource generate(Properties properties) {

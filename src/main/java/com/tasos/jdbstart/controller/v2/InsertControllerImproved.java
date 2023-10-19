@@ -1,20 +1,14 @@
 package com.tasos.jdbstart.controller.v2;
 
-import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
 import com.tasos.jdbstart.controller.BasicController;
 import com.tasos.jdbstart.db.DBUtilsImproved;
 import com.tasos.jdbstart.model.Response;
 import com.tasos.jdbstart.model.Stuff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import javax.sql.DataSource;
-
-import com.sun.net.httpserver.HttpExchange;
+import java.io.IOException;
+import java.sql.PreparedStatement;
 
 public class InsertControllerImproved extends BasicController {
 
@@ -36,7 +30,7 @@ public class InsertControllerImproved extends BasicController {
 
         String sql = "INSERT INTO stuff (placeholder) VALUES (?)";
         
-        DBUtilsImproved.doInTranstaction(dataSource, (conn) -> {
+        DBUtilsImproved.doInTransaction(dataSource, (conn) -> {
             PreparedStatement statement = conn.prepareStatement(sql);
 
             statement.setString(1, stuff.getPlaceholder());

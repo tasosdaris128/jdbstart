@@ -1,19 +1,17 @@
 package com.tasos.jdbstart.db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Savepoint;
-import java.util.Properties;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 public class DBUtil {
-    private static Logger logger = LogManager.getLogger(DBUtil.class);
+    private static final Logger logger = LogManager.getLogger(DBUtil.class);
 
     public static void begin() {
-        logger.info("Begin transtaction...");
+        logger.info("Begin transaction...");
 
         try {
 
@@ -21,7 +19,7 @@ public class DBUtil {
 
             holder.createSavepoint();
 
-            ConnectionManager.upateConnectionHolder(holder);
+            ConnectionManager.updateConnectionHolder(holder);
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
@@ -72,7 +70,7 @@ public class DBUtil {
         }
     }
 
-    public static synchronized void doInTranstaction(ThrowingConsumer consumer) {
+    public static synchronized void doInTransaction(ThrowingConsumer consumer) {
 
         try {
             
@@ -84,11 +82,11 @@ public class DBUtil {
 
             holder.createSavepoint();
 
-            ConnectionManager.upateConnectionHolder(holder);
+            ConnectionManager.updateConnectionHolder(holder);
 
             consumer.consume(connection);
 
-            ConnectionManager.upateConnectionHolder(holder);
+            ConnectionManager.updateConnectionHolder(holder);
 
         } catch (Exception e) {
             
@@ -99,9 +97,9 @@ public class DBUtil {
         }
     }
 
-    public static synchronized <T> T doInTranstactionWithReturn(ThrowingFunction<T> function) {
+    public static synchronized <T> T doInTransactionWithReturn(ThrowingFunction<T> function) {
         
-        T element = null;
+        T element;
 
         try {
 
@@ -113,13 +111,13 @@ public class DBUtil {
 
             holder.createSavepoint();
 
-            ConnectionManager.upateConnectionHolder(holder);
+            ConnectionManager.updateConnectionHolder(holder);
 
             element = function.executeAndReturn(connection);
 
             connection.commit();
 
-            ConnectionManager.upateConnectionHolder(holder);
+            ConnectionManager.updateConnectionHolder(holder);
 
         } catch (Exception e) {
             
