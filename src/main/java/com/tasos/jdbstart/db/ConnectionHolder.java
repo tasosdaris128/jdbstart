@@ -21,6 +21,8 @@ public class ConnectionHolder {
 
     private int savepointCounter = 0;
 
+    private int acquireCounter = 0;
+
     public ConnectionHolder(Connection connection) {
         this.currentConnection = connection;
     }
@@ -61,20 +63,34 @@ public class ConnectionHolder {
         this.isInTransaction = false;
     }
 
-    public Savepoint createSavepoint() {
-        logger.info("Creating savepoint...");
+    public void increaseAcquireCounter() {
+        this.acquireCounter++;
+    }
+
+    public void decreaseAcquireCounter() {
+        this.acquireCounter--;
+
+        if (this.acquireCounter < 0) this.acquireCounter = 0;
+    }
+
+    public void createSavepoint() {
+        String savepointName = SAVEPOINT_PREFIX + this.savepointCounter;
+        logger.info("Creating savepoint {}", savepointName);
         try {
             this.savepointCounter++;
-            this.currentSavepoint = getConnection().setSavepoint(SAVEPOINT_PREFIX + this.savepointCounter);
+            this.currentSavepoint = getConnection().setSavepoint(savepointName);
         } catch (SQLException e) {
             this.savepointCounter--;
             logger.error(e.getMessage(), e);
         }
-        return this.currentSavepoint;
     }
 
     public Savepoint getSavepoint() {
         return this.currentSavepoint;
+    }
+
+    public int getAcquireCounter() {
+        return this.acquireCounter;
     }
     
 }

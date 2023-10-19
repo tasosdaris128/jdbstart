@@ -2,7 +2,6 @@ package com.tasos.jdbstart.db;
 
 import com.tasos.jdbstart.utils.ApplicationContext;
 import com.zaxxer.hikari.HikariDataSource;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,12 +22,6 @@ public class DBUtilTest {
         HikariDataSource dataSource = DataSourceGenerator.generate(properties);
         ApplicationContext.properties(properties);
         ApplicationContext.dataSource(dataSource);
-        DBUtil.begin();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        DBUtil.end();
     }
 
     // The following two tests are just to ensure that we have properly

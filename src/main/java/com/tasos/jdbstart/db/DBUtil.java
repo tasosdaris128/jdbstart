@@ -10,6 +10,7 @@ import java.sql.Savepoint;
 public class DBUtil {
     private static final Logger logger = LogManager.getLogger(DBUtil.class);
 
+    @Deprecated
     public static void begin() {
         logger.info("Begin transaction...");
 
@@ -26,6 +27,7 @@ public class DBUtil {
         }
     }
 
+    @Deprecated
     public static void end() {
         logger.info("End transaction...");
 
@@ -71,10 +73,13 @@ public class DBUtil {
     }
 
     public static synchronized void doInTransaction(ThrowingConsumer consumer) {
+        logger.info("Do transaction without result...");
 
         try {
             
             ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            holder.increaseAcquireCounter();
 
             Connection connection = holder.getConnection();
 
@@ -86,24 +91,65 @@ public class DBUtil {
 
             consumer.consume(connection);
 
-            ConnectionManager.updateConnectionHolder(holder);
+            holder.decreaseAcquireCounter();
+
+            if (holder.getAcquireCounter() == 0) {
+                logger.info("Counter is zero. Committing...");
+
+                connection.commit();
+
+                connection.close();
+
+                ConnectionManager.clear();
+            } else {
+                ConnectionManager.updateConnectionHolder(holder);
+            }
 
         } catch (Exception e) {
             
             logger.error(e.getMessage(), e);
 
-            throw new RuntimeException("Unable to consume connection.");
+            try {
+
+                ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+                holder.decreaseAcquireCounter();
+
+                if (holder.getAcquireCounter() == 0) {
+                    Connection connection = holder.getConnection();
+
+                    Savepoint savepoint = holder.getSavepoint();
+
+                    if (savepoint != null) {
+                        connection.rollback(savepoint);
+                    } else {
+                        connection.rollback();
+                    }
+
+                    connection.close();
+
+                    ConnectionManager.clear();
+                } else {
+                    ConnectionManager.updateConnectionHolder(holder);
+                }
+
+            } catch (SQLException se) {
+                logger.error(se.getMessage(), se);
+            }
 
         }
     }
 
     public static synchronized <T> T doInTransactionWithReturn(ThrowingFunction<T> function) {
-        
-        T element;
+        logger.info("Do transaction with result...");
+
+        T element = null;
 
         try {
 
             ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+            holder.increaseAcquireCounter();
 
             Connection connection = holder.getConnection();
 
@@ -115,15 +161,49 @@ public class DBUtil {
 
             element = function.executeAndReturn(connection);
 
-            connection.commit();
+            holder.decreaseAcquireCounter();
 
-            ConnectionManager.updateConnectionHolder(holder);
+            if (holder.getAcquireCounter() == 0) {
+                connection.commit();
+
+                connection.close();
+
+                ConnectionManager.clear();
+            } else {
+                ConnectionManager.updateConnectionHolder(holder);
+            }
 
         } catch (Exception e) {
             
             logger.error(e.getMessage(), e);
 
-            throw new RuntimeException("Unable to consume connection with return.");
+            try {
+
+                ConnectionHolder holder = ConnectionManager.getConnectionHolder();
+
+                holder.decreaseAcquireCounter();
+
+                if (holder.getAcquireCounter() == 0) {
+                    Connection connection = holder.getConnection();
+
+                    Savepoint savepoint = holder.getSavepoint();
+
+                    if (savepoint != null) {
+                        connection.rollback(savepoint);
+                    } else {
+                        connection.rollback();
+                    }
+
+                    connection.close();
+
+                    ConnectionManager.clear();
+                }
+
+                ConnectionManager.updateConnectionHolder(holder);
+
+            } catch (SQLException se) {
+                logger.error(se.getMessage(), se);
+            }
 
         }
 

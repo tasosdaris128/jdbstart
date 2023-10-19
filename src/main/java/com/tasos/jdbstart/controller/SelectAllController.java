@@ -24,8 +24,6 @@ public class SelectAllController extends BasicController {
 
         String sql = "SELECT id, placeholder FROM stuff";
 
-        DBUtil.begin();
-
         List<Stuff> stuffs = DBUtil.doInTransactionWithReturn((conn) -> {
             List<Stuff> s = new ArrayList<>();
 
@@ -42,8 +40,6 @@ public class SelectAllController extends BasicController {
 
             return s;
         });
-
-        DBUtil.end();
 
         prepareResponse: {
             if (stuffs == null) {

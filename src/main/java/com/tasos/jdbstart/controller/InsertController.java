@@ -24,8 +24,6 @@ public class InsertController extends BasicController {
         final String outerSql = "INSERT INTO stuff (placeholder) VALUES (?)";
         final String innerSql = "INSERT INTO another_stuff (placeholder) VALUES (?)";
 
-        DBUtil.begin();
-
         DBUtil.doInTransaction((outerConn) -> {
             PreparedStatement outerStatement = outerConn.prepareStatement(outerSql);
 
@@ -40,6 +38,18 @@ public class InsertController extends BasicController {
 
                 int innerResult = innerStatement.executeUpdate();
 
+                DBUtil.doInTransaction((esotericConn) -> {
+                    PreparedStatement esotericStatement = esotericConn.prepareStatement(innerSql);
+
+                    esotericStatement.setString(1, stuff.getPlaceholder());
+
+                    int esotericResult = esotericStatement.executeUpdate();
+
+                    logger.info("Esoteric query result: {}", esotericResult);
+
+                    if (esotericStatement != null) esotericStatement.close();
+                });
+
                 logger.info("Inner query result: {}", innerResult);
 
                 if (innerStatement != null) innerStatement.close();
@@ -49,8 +59,6 @@ public class InsertController extends BasicController {
 
             if (outerStatement != null) outerStatement.close();
         });
-
-        DBUtil.end();
 
         Response response = new Response(200, "{\"code\": 200, \"message\": \"OK\"}");
                 
