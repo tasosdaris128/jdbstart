@@ -1,16 +1,12 @@
 package com.tasos.jdbstart.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.zaxxer.hikari.HikariDataSource;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DBUtilsImprovedTest {
 
@@ -33,14 +29,14 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void testThatPropertiesObjectIsNotNull() {
-        assertNotNull(properties, () -> "Properties should not be null. Check .env file.");
+        assertNotNull(properties, "Properties should not be null. Check .env file.");
     }
 
     @Test
     public void testThatPropertiesAreNotEmpty() {
-        assertNotNull(properties.getProperty("url"), () -> "Url property should not be empty. Check .env file.");
-        assertNotNull(properties.getProperty("user"), () ->"Username property should not be empty. Check .env file.");
-        assertNotNull(properties.getProperty("password"), () -> "Password property should not be empty. Check .env file.");
+        assertNotNull(properties.getProperty("url"), "Url property should not be empty. Check .env file.");
+        assertNotNull(properties.getProperty("user"), "Username property should not be empty. Check .env file.");
+        assertNotNull(properties.getProperty("password"), "Password property should not be empty. Check .env file.");
 
         assertFalse(properties.getProperty("url").isEmpty(), "Url property should not be empty. Check .env file");
         assertFalse(properties.getProperty("user").isEmpty(), "Username property should not be empty. Check .env file");
@@ -49,22 +45,18 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void doInTransaction_testThatTheConnectionIsNotNull() {
-        DBUtilsImproved.doInTransaction(dataSource, (conn) -> {
-            assertNotNull(conn, () -> "Connection should not be null.");
-        });
+        DBUtilsImproved.doInTransaction(dataSource, (conn) -> assertNotNull(conn, "Connection should not be null."));
     }
 
     @Test
     public void doInTransaction_testThatTheConnectionIsValid() {
-        DBUtilsImproved.doInTransaction(dataSource, (conn) -> {
-            assertTrue(conn.isValid(10), "Connection to DB is not valid.");
-        });
+        DBUtilsImproved.doInTransaction(dataSource, (conn) -> assertTrue(conn.isValid(10), "Connection to DB is not valid."));
     }
     
     @Test
     public void doInTransactionWithReturn_testThatTheConnectionIsNotNull() {
         DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
-            assertNotNull(conn, () -> "Connection should not be null.");
+            assertNotNull(conn, "Connection should not be null.");
 
             return null;
         });
@@ -81,11 +73,9 @@ public class DBUtilsImprovedTest {
 
     @Test
     public void doInTransactionWithReturn_testThatTheFunctionReturnsObject() {
-        Object o = DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> {
-            return new Object();
-        });
+        Object o = DBUtilsImproved.doInTransactionWithReturn(dataSource, (conn) -> new Object());
 
-        assertNotNull(o, () -> "doInTransactionWithReturn() should return non null object.");
+        assertNotNull(o, "doInTransactionWithReturn() should return non null object.");
     }
 
 }
